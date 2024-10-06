@@ -1,0 +1,357 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  // previewFeatures = ["prismaSchemaFolder"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// Admin panel users
+
+model User {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  email         String   @unique
+  name          String?
+  password      String
+  secret        String?
+  salt          String
+  verified      Boolean
+  role          Role     @default(GUEST)
+  sessions      Session[]
+  basicInfo     BasicInfo?
+  quote         Quote?
+  domain        Domain?
+  avatar        Avatar? 
+  cover         Cover?
+  tartan        Tartan?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+enum Role {
+  GUEST
+  MEMBER
+  PUBLISHER
+  DEVELOPER
+  ADMIN
+  JUDGE
+}
+
+model Session {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  token       String    @unique
+  valid       Boolean   @default(false)
+  userAgent   String?
+  language    String?
+  referer     String?
+  isMobile    Boolean?
+  user        User      @relation(fields:[userId], references:[id])
+  userId      String    @db.ObjectId
+}
+
+// BasicInfo
+
+model FullName {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  firstName       String?
+  lastName        String?
+  basicInfo       BasicInfo @relation(fields:[basicInfoId], references:[id]) 
+  basicInfoId     String    @db.ObjectId @unique
+}
+
+model Career {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  company     String?
+  role        String?
+  basicInfo   BasicInfo @relation(fields:[basicInfoId], references:[id])
+  basicInfoId String    @db.ObjectId @unique
+}
+
+model Education {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  university  String?
+  faculty     String?
+  basicInfo   BasicInfo @relation(fields:[basicInfoId], references:[id])
+  basicInfoId String    @db.ObjectId @unique
+}
+
+model Location {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  country     String?
+  region      String?
+  timeZone    String?
+  basicInfo   BasicInfo @relation(fields:[basicInfoId], references:[id])
+  basicInfoId String    @db.ObjectId @unique
+}
+
+model BasicInfo {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  user       User      @relation(fields:[userId], references:[id]) 
+  userId     String    @db.ObjectId @unique
+  fullName   FullName?
+  career     Career?
+  education  Education?
+  location   Location?
+}
+
+model Quote {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  user       User      @relation(fields:[userId], references:[id]) 
+  userId     String    @db.ObjectId @unique
+  content    String?
+}
+
+model Domain {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  user       User      @relation(fields:[userId], references:[id]) 
+  userId     String    @db.ObjectId @unique
+  value      String?   @unique
+}
+
+model Avatar {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  user       User      @relation(fields:[userId], references:[id]) 
+  userId     String    @db.ObjectId @unique
+  url        String?   
+}
+
+model Cover {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  user       User      @relation(fields:[userId], references:[id]) 
+  userId     String    @db.ObjectId @unique
+  url        String?   
+}
+
+model Tartan {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  user       User      @relation(fields:[userId], references:[id]) 
+  userId     String    @db.ObjectId @unique
+  pattern    String?
+  hashed     String? 
+  url        String? 
+}
+
+// Players and game models
+
+enum AccountType {
+  PREMIUM
+  COMMON
+}
+
+enum RankType {
+  SHEETER 
+  INSTALLER // Todo:; Manager
+  DEALER
+  MANUFACTURER
+}
+
+model Player {
+  id                    String                  @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt             DateTime?               @default(now()) @map("created_at")
+  tgId                  String                  @map("tg_id") @unique
+  isPremium             Boolean                 @map("is_premium")
+  username              String                  @map("user_name")
+
+  active                Boolean                 @default(true) @map("active")
+  incomePerHour         Int                     @default(0) @map("income_per_hour")
+  lastIncomeUpdate      DateTime                @default(now()) @map("last_income_update")
+
+  imageUrl              String?                 @map("image_url")
+
+  firstName             String?                  @map("first_name")
+  lastName              String?                  @map("last_name")
+
+  balance               Int                   @default(0)  
+
+  energyLatest          Float                   @default(300) @map("energy_latest")
+  energyMax             Float                   @default(300) @map("energy_max")
+  // Скорость восстановления энергии в единицах/секундах
+  recoveryRate          Float                   @default(1) @map("recovery_rate")
+  // Время последнего обновления энергии
+  lastEnergyUpdate      DateTime                @default(now()) @map("last_energy_update")
+
+  lastLogin             DateTime?               @map("last_login")
+  lastLogout            DateTime?               @map("last_logout")
+
+  levelId               Int                     @default(1) @map("level_id")
+  referralProfit        Float?                  @default(0) @map("referral_profit")
+
+  token                 PlayerTokens?
+
+  invitedById           String?                 @db.ObjectId @map("invited_by_id")
+  invitedBy             Player?                 @relation("UserInvitations", fields: [invitedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+ 
+  invitations           Player[]                @relation("UserInvitations")
+  referralCode          String                  @unique
+
+  tasks                 TaskOnPlayer[]
+
+   // One-to-One relation with DailyQuest
+  dailyQuest            DailyQuest?   
+
+  rank                  RankType                @default(SHEETER)
+  items                 ItemOnPlayer[]          
+  referralCount  Int       @default(0) @ignore
+
+  minigame              Minigame?               
+
+  @@map("player")
+}
+
+model Referral {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  referrerId    String   @db.ObjectId
+  referredId    String   @db.ObjectId
+  createdAt     DateTime @default(now())
+
+  @@map("refferal")
+}
+
+
+model PlayerTokens {
+    id           String    @id @default(auto()) @map("_id") @db.ObjectId
+    accessToken  String?
+    refreshToken String?    
+    createdAt    DateTime? @default(now()) @map("created_at")
+    updatedAt    DateTime? @updatedAt @map("updated_at")
+    player       Player    @relation(fields: [playerId], references: [id])
+    playerId     String    @db.ObjectId @unique
+
+    @@map("player_tokens")
+}
+
+model DailyQuest {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  playerId        String   @unique @map("player_id") @db.ObjectId
+  player          Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  
+  dailyQuestStreak Int     @default(0)    @map("daily_quest_streak") // Сколько дней подряд забирает награду
+  lastDailyClaim   DateTime?              @map("last_daily_claim")    // Дата последнего забора награды
+  dailyBaseReward  Int     @default(200)  @map("daily_base_reward")   // Базовая награда
+  dailyBonus       Int     @default(50)   @map("daily_max_bonus")     // Максимальный бонус
+  dailyMaxStreak   Int     @default(8)    @map("daily_max_streak")    // Максимальный стрик для получения бонуса
+
+  @@map("daily_quest")
+}
+  
+
+model Item {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  description  String   @default("")
+  imageUrl     String   @default("")
+  level        Int      @default(0)
+  price        Int
+  income       Int        // Пассивный доход, который дает предмет раз в час
+  categoryId   String     @db.ObjectId
+  category     Category   @relation(fields: [categoryId], references: [id])
+  dependencies ItemDependency[] @relation("DependentItems")
+  dependents   ItemDependency[] @relation("ItemDependents")
+  rank         RankType       // Ранг, для которого доступен товар
+  itemOnPlayers ItemOnPlayer[] 
+}
+
+model ItemDependency {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  itemId        String   @db.ObjectId
+  level         Int      @default(1) 
+  item          Item     @relation("DependentItems", fields: [itemId], references: [id])
+  dependsOnId   String   @db.ObjectId
+  dependsOn     Item     @relation("ItemDependents", fields: [dependsOnId], references: [id])
+  name          String   @default("") 
+  @@map("item_dependency")
+}
+
+
+model ItemOnPlayer {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  playerId  String   @db.ObjectId
+  itemId    String   @db.ObjectId
+  player    Player   @relation(fields: [playerId], references: [id])
+  item      Item     @relation(fields: [itemId], references: [id])
+  level     Int      @default(1) 
+  @@map("item_on_player")
+}
+
+model Category {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
+  items Item[]
+}
+
+model Task {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  description  String?
+  type         TaskType
+  baunty       Int?
+  bonus        Int?
+  target       Int?
+  content      String?
+  navigate     String?
+  expiresAt    DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  isDaily      Boolean 
+  playerTasks  TaskOnPlayer[]
+
+   @@map("task")
+}
+
+model TaskOnPlayer {
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  templateTask    Task?           @relation(fields: [templateTaskId], references: [id])
+  templateTaskId  String?         @db.ObjectId
+  player          Player?         @relation(fields: [playerId], references: [id])
+  playerId        String?         @db.ObjectId
+  status          TaskStatus      @default(PENDING)
+  progress        Int             @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  finishedAt      DateTime?
+
+  @@map("task_on_player")
+}
+
+enum TaskType {
+  SUBSCRIBE_CHANNEL
+  INVITE_COUNT
+  DAILY_BAUNTY
+  DAILY_MINIGAME
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  READY
+  COMPLETED
+}
+
+enum MinigameType {
+  FIFTEEN_PUZZLE
+}
+
+model Minigame {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  lastPlayed    DateTime    @default(now())
+  isBlocked     Boolean     @default(false)
+  blockUntil    DateTime?
+  wins          Int         @default(0)
+  playerId      String      @unique @map("player_id") @db.ObjectId
+  player        Player      @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  type          MinigameType @default(FIFTEEN_PUZZLE)
+  baunty        Int          @default(500)
+  
+  @@map("minigame")
+}
+
+
+
