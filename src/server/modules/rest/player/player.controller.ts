@@ -13,6 +13,9 @@ import { GameplayTickResponse } from '@server/modules/gameplay/responses/gamepla
 // import { PlayersTokenDto } from '@/modules/token/dto';
 import { GetReferralsQueryDto } from '../referrals/dto';
 import { ReferralsService } from '../referrals/referrals.service';
+import { AdminGuard } from '../classic-auth/classic-auth.guard';
+import { GetManyPlayersDto } from './player.schema';
+import { ManyPlayersResponse } from './responses/many-players.response';
 
 
 @ApiTags('player')
@@ -23,6 +26,34 @@ export class PlayerController {
     private readonly prisma: PrismaService, 
     private readonly referralsService: ReferralsService
   ) {}
+
+  @ApiResponse({
+    status: 200,
+    description: 'Several players data with usual information and includes tasks, invitations and items',
+    type: ManyPlayersResponse,
+  })
+  @UseGuards(AdminGuard)
+  @Post('many')
+  async getAllPlayers(
+    @Res() reply: FastifyReply,
+    @Body() body: GetManyPlayersDto 
+  ) {
+
+    const { skip, take } = body
+
+    const players = await this.prisma.player.findMany({
+      skip,
+      take,
+      include: {
+        invitations: true,
+        items: true,
+        tasks: true
+      }
+    });
+
+    const total = await this.prisma.player.count();
+    return reply.type('application/json').send({total, players});
+  }
 
   @ApiResponse({
     status: 200,

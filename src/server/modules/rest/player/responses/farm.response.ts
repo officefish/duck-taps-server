@@ -8,6 +8,5 @@ export class PlayerFarmResponse extends PlayerEnergyResponse {
         required: true,
       })
     balance: number
-    
-     
 }
+

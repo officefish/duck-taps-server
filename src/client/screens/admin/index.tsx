@@ -1,6 +1,7 @@
 import { FC, useState } from 'react'
 import Menu from './menu'
 import { EAdminMode, IMenuItem } from './types'
+import PlayersList from './database/player/players.list'
 
 const items = [
   { mode: EAdminMode.PLAYERS, title: 'players' },
@@ -32,7 +33,7 @@ export default AdminPanel
 const renderAdminMode = (mode: EAdminMode) => {
   switch (mode) {
     case EAdminMode.PLAYERS:
-      return null
+      return <PlayersList />
     case EAdminMode.REFFERALS:
       return null
     default:
