@@ -1,5 +1,5 @@
 //import { IRole, User } from '@/client/models/user.model'
-import { IPlayer } from '@/client/models/player.types'
+import { IPlayer, ITask, TaskStatus } from '@/client/models/player.types'
 import { useManyPlayers } from '@/client/services/player.service'
 import { FC, useEffect, useState } from 'react'
 //import UserItem from './user.item'
@@ -153,9 +153,12 @@ const PlayerItem:FC<IPlayerItem> = ({player}) => {
     <td>{player.username}</td>
     <td>{(date?.toDateString()) + ' ' + (time?.toLocaleTimeString())}</td>
     <td>{player.tgId}</td>
-    <td>{player.tasks.length}</td>
+    <td>{`${getCompletedCount(player.tasks)} / ${player.tasks.length}`}</td>
     <td>{player.invitations.length}</td>
   </tr>
   )
 }
 
+function getCompletedCount(tasks: ITask[]): number {
+  return tasks.filter((task) => task.status === TaskStatus.COMPLETED || task.status === TaskStatus.READY).length
+}

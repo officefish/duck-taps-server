@@ -152,6 +152,12 @@ enum RankType {
   MANUFACTURER
 }
 
+enum TauntSexType {
+  UNDEFINED
+  MALE
+  FEMALE
+}
+
 model Player {
   id                    String                  @id @default(auto()) @map("_id") @db.ObjectId
   createdAt             DateTime?               @default(now()) @map("created_at")
@@ -200,7 +206,10 @@ model Player {
   items                 ItemOnPlayer[]          
   referralCount  Int       @default(0) @ignore
 
-  minigame              Minigame?               
+  minigame              Minigame?              
+
+  tauntSex              TauntSexType            @default(UNDEFINED)  @map("taunt_sex")
+  involvement           Int                     @default(0)
 
   @@map("player")
 }
@@ -211,7 +220,20 @@ model Referral {
   referredId    String   @db.ObjectId
   createdAt     DateTime @default(now())
 
+  ReferralDay ReferralDay[]
   @@map("refferal")
+}
+
+model ReferralDay {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  referralId       String   @db.ObjectId
+  day              DateTime @map("day")  // Дата, когда произошла регистрация (используем московское время)
+  registrations    Int      @default(1) // Количество регистраций в этот день
+  createdAt        DateTime @default(now())
+
+  referral         Referral @relation(fields: [referralId], references: [id], onDelete: Cascade)
+
+  @@map("referral_day")
 }
 
 
@@ -323,8 +345,11 @@ model TaskOnPlayer {
 enum TaskType {
   SUBSCRIBE_CHANNEL
   INVITE_COUNT
+  INVITE_PREMIUM_COUNT
+  INVITE_EVERY_DAY
   DAILY_BAUNTY
   DAILY_MINIGAME
+  TAPS_COUNT
 }
 
 enum TaskStatus {

@@ -28,37 +28,110 @@ export class TaskService {
      // Создание категорий и товаров
       const tasks = {
         daily: [
-          { 
-            type: TaskType.DAILY_BAUNTY,
-            title: 'Ежидневная награда',
-            baunty: 200,
-            bonus: 50,
-            navigate: '/daily-quest'
-          },
-          {
-            type: TaskType.DAILY_MINIGAME,
-            title: 'Мини игра',
-            navigate: '/minigame',
-            baunty: 300,
-          }
+        //   { 
+        //     type: TaskType.DAILY_BAUNTY,
+        //     title: 'Ежидневная награда',
+        //     baunty: 200,
+        //     bonus: 50,
+        //     navigate: '/daily-quest'
+        //   },
+        //   {
+        //     type: TaskType.DAILY_MINIGAME,
+        //     title: 'Мини игра',
+        //     navigate: '/minigame',
+        //     baunty: 300,
+        //   }
         ],
         season: [
-            { 
-                type: TaskType.INVITE_COUNT,
-                title: 'Пригласи трех друзей',
-                target: 3,
-                baunty: 7500,
-                navigate: '/friends',
-                expiresAt,
-            },
-            { 
-                type: TaskType.SUBSCRIBE_CHANNEL,
-                content: 'portal_okon',
-                navigate: 'https://t.me/portal_okon',
-                title: 'Подпишись на канал',
-                baunty: 2500,
-                expiresAt,
-            }
+          /* Пригласи друзей */
+          { 
+            type: TaskType.INVITE_COUNT,
+            title: 'Пригласи пять друзей',
+            target: 5,
+            baunty: 5,
+            expiresAt,
+          },
+          { 
+            type: TaskType.INVITE_COUNT,
+            title: 'Пригласи десять друзей',
+            target: 10,
+            baunty: 5,
+            expiresAt,
+          },
+          { 
+            type: TaskType.INVITE_COUNT,
+            title: 'Пригласи пятнадцать друзей',
+            target: 50,
+            baunty: 5,
+            expiresAt,
+          },
+          { 
+            type: TaskType.INVITE_COUNT,
+            title: 'Пригласи сто друзей',
+            target: 100,
+            baunty: 5,
+            expiresAt,
+         },
+         { 
+          type: TaskType.INVITE_COUNT,
+          title: 'Пригласи тысячу друзей',
+          target: 1000,
+          baunty: 5,
+          expiresAt,
+        },
+       /* Пригласи друзей c premium */
+       { 
+        type: TaskType.INVITE_PREMIUM_COUNT,
+        title: 'Пригласи пять друзей с премиум аккаунтом',
+        target: 5,
+        baunty: 10,
+        expiresAt,
+      },
+      /* Приглашай друзей каждый день */
+      { 
+        type: TaskType.INVITE_EVERY_DAY,
+        title: 'Приглашай друзей 5 дней подряд',
+        target: 5,
+        baunty: 5,
+        expiresAt,
+      },
+      { 
+        type: TaskType.INVITE_EVERY_DAY,
+        title: 'Приглашай друзей 10 дней подряд',
+        target: 10,
+        baunty: 10,
+        expiresAt,
+      },
+      { 
+        type: TaskType.INVITE_EVERY_DAY,
+        title: 'Приглашай друзей 30 дней подряд',
+        target: 30,
+        baunty: 20,
+        expiresAt,
+      },
+      /* Кликни по игрушке */
+      { 
+        type: TaskType.TAPS_COUNT,
+        title: 'Кликни по игрушке 1000 раз',
+        target: 1000,
+        baunty: 5,
+        expiresAt,
+      },
+      { 
+        type: TaskType.TAPS_COUNT,
+        title: 'Кликни по игрушке 10000 раз',
+        target: 10_000,
+        baunty: 5,
+        expiresAt,
+      },
+      { 
+        type: TaskType.TAPS_COUNT,
+        title: 'Кликни по игрушке 100000 раз',
+        target: 100_000,
+        baunty: 10,
+        expiresAt,
+      },
+         
         ]
       };
 

@@ -1,3 +1,21 @@
+export enum TaskStatus {
+    PENDING = "PENDING",
+    IN_PROGRESS = "IN_PROGRESS",
+    READY = "READY",
+    COMPLETED = "COMPLETED",
+}
+
+export interface ITask {
+    id: string
+    templateTaskId : string
+    playerId: string
+    status: TaskStatus
+    progress: string
+    createdAt: string
+    updatedAt: string
+    finishedAt: string
+}
+
 export interface IPlayer {
     active: boolean 
     balance: number
@@ -22,7 +40,7 @@ export interface IPlayer {
     recoveryRate: number
     referralCode: string 
     referralProfit: number
-    tasks?: any
+    tasks?: ITask[]
     tgId: string
     username?: string
 }

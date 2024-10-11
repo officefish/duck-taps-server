@@ -1,11 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { Player, RankType } from '@prisma/client'
-import { UUID } from 'crypto';
-
-export enum AccountType {
-  PREMIUM,
-  COMMON
-}
+import { Player, RankType, TauntSexType } from '@prisma/client'
+//import { UUID } from 'crypto';
 
 export class ItemOnPlayerType {
   @ApiProperty({ description: 'Unique identifier for the player item', example: '507f1f77bcf86cd799439011' })
@@ -87,6 +82,12 @@ export class PlayerMinType {
 
   @ApiProperty({ description: 'Player refferal code for personal invitations', example: '507f1f77bcf86cd799439011', nullable: true })
   referralCode: string;
+
+  @ApiProperty({ description: 'Taunt sex selection of the player', example: TauntSexType.UNDEFINED, nullable: true })
+  tauntSex: TauntSexType;
+
+  @ApiProperty({ description: 'Player community involvement', example: 25 })
+  involvement: number;
 
 }
 
