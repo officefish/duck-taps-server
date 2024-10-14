@@ -14,7 +14,7 @@ async function bootstrap() {
   app.setGlobalPrefix('/api/v1')
 
   /* installation of auxiliary modules */
-  initializeSentry(app)
+  //initializeSentry(app)
   initializeCors(app)
   initializeStaticAssets(app)
   initializeSwagger(app)

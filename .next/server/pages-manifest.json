@@ -1,1 +1,1 @@
-{}
+{"/_app":"pages/_app.js","/_error":"pages/_error.js","/_document":"pages/_document.js","/auth/forgot-password":"pages/auth/forgot-password.html","/auth/sign-up":"pages/auth/sign-up.html","/me":"pages/me.js","/auth/password-reset/[...params]":"pages/auth/password-reset/[...params].js","/admin":"pages/admin.js","/auth/sign-in":"pages/auth/sign-in.js","/":"pages/index.js","/404":"pages/404.html"}

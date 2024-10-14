@@ -8,7 +8,7 @@ export async function nextRoutes(app: INestApplication) {
     //get all _next response as usual
     server.next('/')
     server.next('/me')
-    server.next('/me/settings')
+    // server.next('/me/settings')
 
     server.next(`/auth/sign-in`)
     server.next(`/auth/sign-up`)
