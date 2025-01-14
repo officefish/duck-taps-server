@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Options, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Options, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
 import { GameplayService } from '@server/modules/gameplay/gameplay.service'
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PlayerEnergyResponse, PlayerFarmResponse } from './responses';
@@ -16,6 +16,9 @@ import { ReferralsService } from '../referrals/referrals.service';
 import { AdminGuard } from '../classic-auth/classic-auth.guard';
 import { GetManyPlayersDto } from './player.schema';
 import { ManyPlayersResponse } from './responses/many-players.response';
+import { TauntSexType } from '@prisma/client';
+import { UpdateTauntSexDto } from './dto/updateTauntSex.dto';
+import { FullPlayerResponse } from './responses/player.response';
 
 
 @ApiTags('player')
@@ -216,6 +219,47 @@ export class PlayerController {
       });
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'Player successfuly updated taunt',
+    type: FullPlayerResponse,
+  })
+
+  @UseGuards(PlayerGuard)
+  @Put('taunt/sex')
+  @Player()
+  async updateTauntSex(
+    @Body() body: UpdateTauntSexDto,
+    @Req() req: FastifyRequest
+  ) {
+    const { tgId } = req.currentUser
+    /* Player */
+    const player = await this.prisma.player.findUnique({ where: { tgId } })
+    if (!player) {
+      throw new NotFoundException('User not found');
+    }
+
+    const tauntSex = await this.getTauntSex(body.sex)
+
+    return await this.prisma.player.update({ 
+      where: { id: player.id },
+      data: {
+        tauntSex,
+      }
+    })
+  }
+
+  async getTauntSex (sex: string) {
+    switch (sex) {
+      case 'male':
+      case "MALE":  
+        return TauntSexType.MALE;
+      case 'female':
+      case "FEMALE":
+        return TauntSexType.FEMALE;
+    }
+    return TauntSexType.UNDEFINED
+  }
 }
 
 

@@ -212,6 +212,7 @@ model Player {
   involvement           Int                     @default(0)
 
   @@map("player")
+  
 }
 
 model Referral {
@@ -334,7 +335,8 @@ model TaskOnPlayer {
   player          Player?         @relation(fields: [playerId], references: [id])
   playerId        String?         @db.ObjectId
   status          TaskStatus      @default(PENDING)
-  progress        Int             @default(0)
+  progress        Int?            
+  maxProgress     Int?             
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
   finishedAt      DateTime?

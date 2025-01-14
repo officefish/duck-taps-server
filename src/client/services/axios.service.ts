@@ -282,7 +282,7 @@ export const useAxiosGetOnceAndTrigger = <T = object>({
 }
 
 export const useAxiosPostTrigger = <T = object>({
-  protocol = 'http',
+  protocol = 'https',
   api = API_PREFIX,
   route = 'me',
   input = null,
@@ -352,7 +352,7 @@ export const useAxiosPostTrigger = <T = object>({
 }
 
 export const useAxiosPutTrigger = <T = object>({
-  protocol = 'http',
+  protocol = 'https',
   api = API_PREFIX,
   route = 'me',
   headers = {
@@ -419,7 +419,7 @@ export const useAxiosPutTrigger = <T = object>({
 }
 
 export const useAxiosDeleteTrigger = <T = object>({
-  protocol = 'http',
+  protocol = 'https',
   api = API_PREFIX,
   route = 'me',
   headers = {
@@ -486,7 +486,7 @@ export const useAxiosDeleteTrigger = <T = object>({
 }
 
 export const useAxiosGetTrigger = <T = object>({
-  protocol = 'http',
+  protocol = 'https',
   api = API_PREFIX,
   route = 'me',
   headers = {

@@ -25,6 +25,23 @@ export class TaskService {
     // Если не ежедневное, установите срок истечения через 3 месяца
     const expiresAt = new Date(new Date().setMonth(new Date().getMonth() + 3)); 
 
+    /*
+    Пригласи 5 друзей
+    Пригласи 10 друзей
+    Пригласи 50 друзей
+    Пригласи 100 друзей
+    Пригласи 1000 друзей
+    Пригласи 5 премиум друзей
+    Ежедневные приглашения 0/5
+    Ежедневные приглашения 0/10
+    Ежедневные приглашения 0/30
+    Подпишись на телеграм канал
+    Подпишись на телеграм чат
+    Потапай по своему персонажу 0/1000
+    Потапай по своему персонажу 0/10k
+    Потапай по своему персонажу 0/100k
+    */
+
      // Создание категорий и товаров
       const tasks = {
         daily: [
@@ -46,35 +63,35 @@ export class TaskService {
           /* Пригласи друзей */
           { 
             type: TaskType.INVITE_COUNT,
-            title: 'Пригласи пять друзей',
+            title: 'Пригласи 5 друзей',
             target: 5,
             baunty: 5,
             expiresAt,
           },
           { 
             type: TaskType.INVITE_COUNT,
-            title: 'Пригласи десять друзей',
+            title: 'Пригласи 10 друзей',
             target: 10,
             baunty: 5,
             expiresAt,
           },
           { 
             type: TaskType.INVITE_COUNT,
-            title: 'Пригласи пятнадцать друзей',
+            title: 'Пригласи 50 друзей',
             target: 50,
             baunty: 5,
             expiresAt,
           },
           { 
             type: TaskType.INVITE_COUNT,
-            title: 'Пригласи сто друзей',
+            title: 'Пригласи 100 друзей',
             target: 100,
             baunty: 5,
             expiresAt,
          },
          { 
           type: TaskType.INVITE_COUNT,
-          title: 'Пригласи тысячу друзей',
+          title: 'Пригласи 1000 друзей',
           target: 1000,
           baunty: 5,
           expiresAt,
@@ -82,7 +99,7 @@ export class TaskService {
        /* Пригласи друзей c premium */
        { 
         type: TaskType.INVITE_PREMIUM_COUNT,
-        title: 'Пригласи пять друзей с премиум аккаунтом',
+        title: 'Пригласи 5 друзей с премиум аккаунтом',
         target: 5,
         baunty: 10,
         expiresAt,
@@ -112,25 +129,48 @@ export class TaskService {
       /* Кликни по игрушке */
       { 
         type: TaskType.TAPS_COUNT,
-        title: 'Кликни по игрушке 1000 раз',
+        title: 'Потапай по своему персонажу 1000 раз',
         target: 1000,
         baunty: 5,
         expiresAt,
       },
       { 
         type: TaskType.TAPS_COUNT,
-        title: 'Кликни по игрушке 10000 раз',
+        title: 'Потапай по своему персонажу 10.000 раз',
         target: 10_000,
         baunty: 5,
         expiresAt,
       },
       { 
         type: TaskType.TAPS_COUNT,
-        title: 'Кликни по игрушке 100000 раз',
+        title: 'Потапай по своему персонажу 100.000 раз',
         target: 100_000,
         baunty: 10,
         expiresAt,
       },
+
+      { 
+        type: TaskType.SUBSCRIBE_CHANNEL,
+        title: 'Подпишись на канал',
+        baunty: 10,
+        content: 'farmducks',
+        navigate: 'https://t.me/farmducks',
+        expiresAt,
+      },
+      { 
+        type: TaskType.SUBSCRIBE_CHANNEL,
+        title: 'Подпишись на чат',
+        baunty: 10,
+        content: '+mBPrR2hbVVYxZDcy',
+        navigate: 'https://t.me/+mBPrR2hbVVYxZDcy',
+        expiresAt,
+      },
+      // { 
+      //   type: TaskType.TAPS_COUNT,
+      //   title: 'Подпишись на чат',
+      //   baunty: 5,
+      //   expiresAt,
+      // },
          
         ]
       };
@@ -168,16 +208,9 @@ export class TaskService {
     await Promise.all(taskPromises);
   }
 
-  async getTasksForPlayer(tgId: string) {
+  async getTasksForPlayer(player: Player) {
     // Находим игрока по его Telegram ID
-    const player = await this.prisma.player.findUnique({
-      where: { tgId: tgId },
-    });
-
-    if (!player) {
-      throw new Error(`Player with tgId ${tgId} not found`);
-    }
-
+    
     const playerTasks = await this.prisma.taskOnPlayer.findMany({
       where: {
         playerId: player.id,
@@ -190,31 +223,8 @@ export class TaskService {
       return playerTasks
     }
 
-    //Извлекаем активные задачи (например, не просроченные и ежедневные)
-    // const availableTasks = await this.prisma.task.findMany({
-    //   where: {
-    //     OR: [
-    //       { isDaily: true }, // ежедневные задания
-    //       { expiresAt: { gte: new Date() } }, // задания с активным сроком действия
-    //     ],
-    //   },
-    // });
     const availableTasks = await this.prisma.task.findMany({})
 
-    // Проверяем, какие задания уже существуют для игрока
-    // const playerTasks = await this.prisma.taskOnPlayer.findMany({
-    //   where: {
-    //     playerId: player.id,
-    //     templateTaskId: { in: availableTasks.map(task => task.id) },
-    //   },
-    // });
-
-    // const existingTaskIds = playerTasks.map(pt => pt.templateTaskId);
-
-    // // Оставляем только те задания, которые еще не назначены игроку
-    // const newTasks = availableTasks.filter(task => !existingTaskIds.includes(task.id));
-
-    // Создаем новые задания для игрока с использованием connect
     const taskPromises = availableTasks.map(task => this.prisma.taskOnPlayer.create({
       data: {
         templateTask: {
@@ -257,6 +267,10 @@ export class TaskService {
             return this.checkSubscription(player, task, task.templateTask);
           case TaskType.INVITE_COUNT:
             return this.checkInviteCount(player, task, task.templateTask);
+          case TaskType.INVITE_PREMIUM_COUNT:
+            return this.checkInvitePremiumCount(player, task, task.templateTask);
+            case TaskType.TAPS_COUNT:
+              return this.checkTapsCount(player, task, task.templateTask);
           case TaskType.DAILY_MINIGAME:
             return this.checkDailyMinigame(player, task);
           case TaskType.DAILY_BAUNTY:
@@ -272,6 +286,11 @@ export class TaskService {
       include: {
         templateTask: true, // Включаем информацию о шаблоне задания
       },
+      orderBy: [
+        {
+          updatedAt: "desc", // or pass "asc" to order ascendingly
+        },
+      ],
     });
     return updatedTasks;
 
@@ -296,32 +315,115 @@ export class TaskService {
 
   }
 
-  // Проверка количества приглашений
-  async checkInviteCount(player: Player, taskOnPlayer: TaskOnPlayer, task:Task) {
-    const referrals = await this.prisma.referral.findMany({
-      where: { referrerId: player.id },
-    })
-
+  async checkTapsCount(player: Player, taskOnPlayer: TaskOnPlayer, task:Task) {
+   
     if (taskOnPlayer.status === TaskStatus.COMPLETED 
       || taskOnPlayer.status === TaskStatus.READY) {
       return 
     }
 
-    if (!referrals || referrals.length === 0) {
-      return 
-    }
+    const taps = player.balance
 
-    if (referrals.length < task.target) {
-      await this.prisma.taskOnPlayer.update({
+    if (taps < task.target) {
+       await this.prisma.taskOnPlayer.update({
         where: { id: taskOnPlayer.id },
-        data: { status: TaskStatus.IN_PROGRESS },
+        data: { status: TaskStatus.IN_PROGRESS,
+          progress: taps,
+          maxProgress: task.target,
+          updatedAt: new Date(),
+         },
       })
       return 
     }
 
     await this.prisma.taskOnPlayer.update({
       where: { id: taskOnPlayer.id },
-      data: { status: TaskStatus.READY },
+      data: { 
+        status: TaskStatus.READY,
+        updatedAt: new Date(),
+      },
+    })
+  }
+
+  // Проверка количества приглашений
+  async checkInviteCount(player: Player, taskOnPlayer: TaskOnPlayer, task:Task) {
+   
+    if (taskOnPlayer.status === TaskStatus.COMPLETED 
+      || taskOnPlayer.status === TaskStatus.READY) {
+      return 
+    }
+
+    const referrer = await this.prisma.player.findUnique({
+      where: { tgId: player.tgId },
+      include: { invitations: true },
+    })
+
+    if (!referrer) {
+      return 
+    }
+
+    if (referrer.invitations.length < task.target) {
+      await this.prisma.taskOnPlayer.update({
+        where: { id: taskOnPlayer.id },
+        data: { 
+          status: TaskStatus.IN_PROGRESS,
+          progress: referrer.invitations.length,
+          maxProgress: task.target,
+          updatedAt: new Date()
+         },
+      })
+      return 
+    }
+
+    await this.prisma.taskOnPlayer.update({
+      where: { id: taskOnPlayer.id },
+      data: { 
+        status: TaskStatus.READY,
+        updatedAt: new Date()
+      },
+    })
+  }
+
+  async checkInvitePremiumCount(player: Player, taskOnPlayer: TaskOnPlayer, task:Task) {
+   
+    if (taskOnPlayer.status === TaskStatus.COMPLETED 
+      || taskOnPlayer.status === TaskStatus.READY) {
+      return 
+    }
+
+    const playerWithInvitations = await this.prisma.player.findUnique({
+      where: { tgId: player.tgId },
+      include: { invitations: true },
+    })
+
+    if (!playerWithInvitations || playerWithInvitations.invitations.length === 0) {
+      return
+    }
+
+    const premiumInvitations = playerWithInvitations.invitations.filter(player => player.isPremium === true)
+
+    if (!premiumInvitations || premiumInvitations.length === 0) {
+      return 
+    }
+
+    if (premiumInvitations.length < task.target) {
+      await this.prisma.taskOnPlayer.update({
+        where: { id: taskOnPlayer.id },
+        data: { status: TaskStatus.IN_PROGRESS,
+          progress: premiumInvitations.length,
+          maxProgress: task.target,
+          updatedAt: new Date(),
+         },
+      })
+      return 
+    }
+
+    await this.prisma.taskOnPlayer.update({
+      where: { id: taskOnPlayer.id },
+      data: { 
+        status: TaskStatus.READY,
+        updatedAt: new Date(),
+       },
     })
   }
 
@@ -394,6 +496,5 @@ export class TaskService {
     return updatedTasks;
 
   }
-
 }
 

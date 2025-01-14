@@ -10,7 +10,13 @@ export function initializeCors(app: INestApplication) {
   const productionCorsOptions: FastifyCorsOptions = {
     origin: [
       'https://web.telegram.org', // Домен Web Telegram App
-      'https://duck-taps.vercel.app' // Домен Vercel
+      'https://duck-taps.vercel.app', // Домен Vercel
+      'http://tonfarm.ru',
+      'https://tonfarm.ru',
+      'http://45.8.250.204',
+      'https://45.8.250.204',
+      'https://farmducks.ru'
+
     ],
     credentials: true,
     preflightContinue: true,
@@ -64,7 +70,13 @@ export function initializeCors(app: INestApplication) {
         if (process.env.NODE_ENV === 'production') {
           const allowedOrigins = [
             'https://web.telegram.org',
-            'https://duck-taps.vercel.app'
+            'https://duck-taps.vercel.app',
+            'http://tonfarm.ru',
+            'https://tonfarm.ru',
+            'http://45.8.250.204',
+            'https://45.8.250.204',
+            'http://localhost:5173',
+            'https://farmducks.ru'
           ];
     
           // Проверяем заголовок Origin
